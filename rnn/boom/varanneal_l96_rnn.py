@@ -5,6 +5,8 @@ Example deep neural network annealing.
 import numpy as np
 from varanneal import va_nnet
 import sys, time
+import matplotlib.pyplot as plt
+
 
 ninit = int(sys.argv[1])
 M = int(sys.argv[2])
@@ -38,12 +40,20 @@ RM = 1.0
 RF0 = 1.0e-8 * RM * float(np.sum(structure) - structure[0]) / float(structure[0] + structure[-1])
 # alpha, and beta ladder
 alpha = 1.1
-beta_array = np.linspace(0, 435, 436)
-################################################################################
+#beta_array = np.linspace(0, 435, 436)
+beta_array = np.linspace(0, 10, 11)
+########################################################################
 # Input and output data
 ################################################################################
-data_in = np.load("../data_from_sharedrive/imtrain_noisy_[1, 7].npy")[:M]
-data_out = np.load("../data_from_sharedrive/labtrain_noisy_[1, 7].npy")[:M]
+data = np.load("../l96/data/l96_data_N5_noisy.npy")
+var1 = data[:,0]
+var1 /= np.max(var1)
+data_in = np.empty(shape=(M,D_in))
+data_out = np.empty(shape=(M,D_out))
+for m in xrange(M):
+    data_in[m,:] = var1[m:m+D_in]
+    data_out[m,:] = var1[m+D_in+1:m+D_in+1+D_out]
+
 
 ################################################################################
 # Initial path/parameter guesses
@@ -128,3 +138,5 @@ print("\nADOL-C annealing completed in %f s."%(time.time() - tstart))
 anneal1.save_Wb("DH%d_%dex/W_%d.npy"%(D_hidden, M, ninit), 
                 "DH%d_%dex/b_%d.npy"%(D_hidden, M, ninit), dtype=np.float16)
 anneal1.save_action_errors("DH%d_%dex/action_errors_%d.npy"%(D_hidden, M, ninit))
+
+
